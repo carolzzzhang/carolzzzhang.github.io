@@ -74,12 +74,13 @@ function MealsView() {
     <h2 class="panel-title">记录今天的三餐</h2>
     <form id="meal-form" class="meal-form">
       <div class="form-row">
-        <select name="mealType" required>
-          <option value="早餐">早餐</option>
-          <option value="午餐">午餐</option>
-          <option value="晚餐">晚餐</option>
-          <option value="加餐">加餐</option>
-        </select>
+        <div class="segmented" role="tablist" aria-label="餐别">
+          <button type="button" class="seg-btn is-active" data-value="早餐" aria-selected="true">早餐</button>
+          <button type="button" class="seg-btn" data-value="午餐" aria-selected="false">午餐</button>
+          <button type="button" class="seg-btn" data-value="晚餐" aria-selected="false">晚餐</button>
+          <button type="button" class="seg-btn" data-value="加餐" aria-selected="false">加餐</button>
+        </div>
+        <input type="hidden" name="mealType" value="早餐">
         <input type="text" name="title" placeholder="菜名 / 简要描述" required>
       </div>
       <div class="form-row">
@@ -122,6 +123,15 @@ function bindMealsViewEvents() {
   const fileInput = $('#meal-photo');
   const preview = $('#meal-preview');
   const resetBtn = $('#meal-reset');
+  const segButtons = $$('.seg-btn');
+
+  segButtons.forEach(btn => btn.addEventListener('click', () => {
+    segButtons.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-selected', 'false'); });
+    btn.classList.add('is-active');
+    btn.setAttribute('aria-selected', 'true');
+    const hidden = $('input[name="mealType"]');
+    hidden.value = btn.dataset.value;
+  }));
 
   function updatePreview(file) {
     if (!file) { preview.style.display = 'none'; preview.src=''; return; }
