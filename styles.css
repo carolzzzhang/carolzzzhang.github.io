@@ -52,7 +52,7 @@ body {
 
 .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
 /* 表单行间距，避免元素堆叠 */
-.meal-form .form-row + .form-row { margin-top: 12px; }
+.meal-form .form-row + .form-row { margin-top: 16px; }
 input[type="text"], input[type="url"], textarea, select {
   border: 2px solid var(--border); border-radius: 12px;
   padding: 10px 12px; background: #fff;
@@ -94,11 +94,11 @@ textarea { min-height: 90px; }
 }
 
 /* 横向按钮组（餐别） */
-.segmented { display: flex; gap: 8px; flex-wrap: wrap; }
+.segmented { display: flex; gap: 10px; flex-wrap: wrap; }
 .seg-btn {
   background: #fff; color: var(--text);
   border: 2px solid var(--border);
-  padding: 8px 14px; border-radius: 12px; cursor: pointer;
+  padding: 10px 16px; border-radius: 12px; cursor: pointer;
   font-family: "Patrick Hand", cursive; font-size: 15px;
 }
 .seg-btn.is-active { background: var(--bg-elev); box-shadow: 2px 2px 0 #000; }
