@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>食记 · Carol</title>
+  <meta name="description" content="记录三餐、导入与查询菜谱的轻量应用">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-title">食记 · Carol</div>
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn is-active" data-route="#/meals" aria-selected="true">三餐</button>
+      <button class="tab-btn" data-route="#/recipes" aria-selected="false">菜谱</button>
+      <button class="tab-btn" data-route="#/import" aria-selected="false">导入</button>
+    </nav>
+  </header>
+
+  <main id="app" class="app-container" role="main">
+    <!-- 动态内容将由 app.js 注入 -->
+  </main>
+
+  <footer class="site-footer">
+    <div>© <span id="year"></span> Carol · 记录你的美味生活</div>
+  </footer>
+
+  <script src="./app.js" type="module"></script>
+  <script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+

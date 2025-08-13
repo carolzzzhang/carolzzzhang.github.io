@@ -1,0 +1,92 @@
+/* 奶白底 + 黑色手绘风（Notion风格） */
+:root {
+  --bg: #faf7f2;
+  --bg-elev: #fffaf2;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --border: #1a1a1a;
+  --accent: #111;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", "Noto Sans", sans-serif;
+  line-height: 1.6;
+}
+
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: var(--bg);
+  border-bottom: 2px solid var(--border);
+}
+.site-title {
+  font-family: "Patrick Hand", cursive;
+  font-size: 22px; letter-spacing: .5px;
+}
+.nav-tabs { display: flex; gap: 8px; }
+.tab-btn {
+  background: transparent; border: 2px solid var(--border);
+  padding: 6px 12px; border-radius: 10px;
+  font-family: "Patrick Hand", cursive; font-size: 16px;
+  color: var(--text); cursor: pointer;
+}
+.tab-btn.is-active { background: var(--bg-elev); box-shadow: 2px 2px 0 #000; }
+.tab-btn:focus-visible { outline: 3px dashed #000; outline-offset: 3px; }
+
+.app-container { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+
+.panel {
+  background: var(--bg-elev);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 16px; box-shadow: 6px 6px 0 #00000012;
+}
+.panel + .panel { margin-top: 16px; }
+.panel-title { font-weight: 600; margin: 0 0 8px; }
+.muted { color: var(--muted); }
+
+.form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+input[type="text"], input[type="url"], textarea, select {
+  border: 2px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; background: #fff;
+  font-size: 14px; width: 100%;
+}
+textarea { min-height: 90px; }
+
+.btn {
+  background: #000; color: #fff; border: 2px solid var(--border);
+  padding: 10px 14px; border-radius: 12px; cursor: pointer;
+  font-weight: 600;
+}
+.btn.secondary { background: #fff; color: #000; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.card { border: 2px solid var(--border); border-radius: 16px; overflow: hidden; background: #fff; }
+.card img { width: 100%; height: 140px; object-fit: cover; display: block; border-bottom: 2px solid var(--border); }
+.card .card-body { padding: 10px 12px; }
+.badge { display: inline-block; padding: 2px 8px; border: 2px solid var(--border); border-radius: 999px; font-size: 12px; margin-right: 6px; }
+
+.search-bar { display: flex; gap: 8px; }
+.search-bar input { flex: 1; }
+
+.site-footer { text-align: center; padding: 30px 16px; color: var(--muted); }
+
+/* 上传图片预览 */
+.preview-img { width: 100%; max-height: 220px; object-fit: cover; border: 2px solid var(--border); border-radius: 12px; }
+
+/* 手绘风分割线 */
+.scribble { border: 0; border-top: 2px dashed var(--border); margin: 12px 0; }
+
+/* 小屏优化 */
+@media (max-width: 520px) {
+  .nav-tabs { gap: 6px; flex-wrap: wrap; }
+  .tab-btn { padding: 6px 10px; }
+}
+
+
