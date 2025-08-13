@@ -51,6 +51,8 @@ body {
 .muted { color: var(--muted); }
 
 .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+/* 表单行间距，避免元素堆叠 */
+.meal-form .form-row + .form-row { margin-top: 12px; }
 input[type="text"], input[type="url"], textarea, select {
   border: 2px solid var(--border); border-radius: 12px;
   padding: 10px 12px; background: #fff;
@@ -61,8 +63,10 @@ textarea { min-height: 90px; }
 .btn {
   background: #000; color: #fff; border: 2px solid var(--border);
   padding: 10px 14px; border-radius: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
   font-weight: 600;
 }
+.btn .icon { width: 16px; height: 16px; }
 .btn.secondary { background: #fff; color: #000; }
 .btn:disabled { opacity: .6; cursor: not-allowed; }
 
@@ -98,5 +102,11 @@ textarea { min-height: 90px; }
   font-family: "Patrick Hand", cursive; font-size: 15px;
 }
 .seg-btn.is-active { background: var(--bg-elev); box-shadow: 2px 2px 0 #000; }
+
+/* 无障碍隐藏（但可被屏幕阅读器读取） */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 

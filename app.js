@@ -84,7 +84,13 @@ function MealsView() {
         <input type="text" name="title" placeholder="菜名 / 简要描述" required>
       </div>
       <div class="form-row">
-        <input type="file" accept="image/*" name="photo" id="meal-photo" capture="environment">
+        <input type="file" accept="image/*" name="photo" id="meal-photo" capture="environment" class="visually-hidden">
+        <label for="meal-photo" class="btn secondary" id="trigger-photo">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="M9 3l-1.5 2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2.5L15 3H9zm3 14a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" fill="currentColor"/>
+          </svg>
+          拍照/上传
+        </label>
       </div>
       <div class="form-row">
         <textarea name="notes" placeholder="口味、用料、感受…"></textarea>
