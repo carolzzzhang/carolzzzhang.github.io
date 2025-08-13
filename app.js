@@ -108,7 +108,7 @@ function MealsView() {
 
   <section class="panel">
     <h3 class="panel-title">最近记录</h3>
-    <div class="grid">
+    <div class="grid" id="meals-grid">
       ${meals.map(m => `
         <article class="card" data-id="${m.id}">
           ${ImageOrPlaceholder(m.photoDataUrl, m.title)}
@@ -116,6 +116,9 @@ function MealsView() {
             <div>${MealBadge(m.mealType)} <strong>${m.title}</strong></div>
             <div class="muted">${new Date(m.createdAt).toLocaleString()}</div>
             ${m.tags?.length ? `<div class="muted">#${m.tags.join(' #')}</div>` : ''}
+            <div class="toolbar">
+              <button class="icon-btn" data-action="delete" data-id="${m.id}">删除</button>
+            </div>
           </div>
         </article>
       `).join('')}
@@ -178,6 +181,17 @@ function bindMealsViewEvents() {
     form.reset();
     $('#meal-preview').style.display = 'none';
   });
+
+  // 删除记录（确认弹窗）
+  $('#meals-grid')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="delete"]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const ok = window.confirm('Delete this record? 确认删除这条记录吗？');
+    if (!ok) return;
+    const next = state.meals.filter(m => m.id !== id);
+    setState({ meals: next });
+  });
 }
 
 function fileToDataUrl(file) {
@@ -189,9 +203,35 @@ function fileToDataUrl(file) {
   });
 }
 
-/** ---------- 视图：菜谱列表/搜索 ---------- */
+/** ---------- 视图：菜谱（分组 + 搜索 + 新建） ---------- */
 function RecipesView() {
   return `
+  <section class="panel">
+    <h2 class="panel-title">撰写自己的菜谱</h2>
+    <form id="recipe-form-own" class="recipe-form">
+      <div class="form-row">
+        <input type="text" name="title" placeholder="标题（必填）" required>
+      </div>
+      <div class="form-row">
+        <input type="file" accept="image/*" id="recipe-cover" name="cover" class="visually-hidden">
+        <label for="recipe-cover" class="btn secondary">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 3l-1.5 2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2.5L15 3H9zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" fill="currentColor"/></svg>
+          添加封面
+        </label>
+        <img id="recipe-cover-preview" class="preview-img" style="display:none;" alt="封面预览"/>
+      </div>
+      <div class="form-row">
+        <textarea name="notes" placeholder="菜谱步骤/要点/用料…"></textarea>
+      </div>
+      <div class="form-row">
+        <input type="text" name="tags" placeholder="标签：逗号分隔 如 家常,低脂,快手">
+      </div>
+      <div class="form-row">
+        <button class="btn" type="submit">保存到我的菜谱</button>
+        <button class="btn secondary" type="reset" id="recipe-own-reset">清空</button>
+      </div>
+    </form>
+  </section>
   <section class="panel">
     <h2 class="panel-title">查询菜谱</h2>
     <div class="search-bar">
@@ -200,42 +240,115 @@ function RecipesView() {
     </div>
   </section>
   <section class="panel">
+    <h3 class="panel-title">From others</h3>
+    <div id="recipe-list-external" class="grid"></div>
+  </section>
+  <section class="panel">
     <h3 class="panel-title">我的菜谱</h3>
-    <div id="recipe-results" class="grid"></div>
+    <div id="recipe-list-own" class="grid"></div>
   </section>
   `;
 }
 
 function bindRecipesViewEvents() {
-  const results = $('#recipe-results');
-  function renderList(list) {
-    results.innerHTML = list.map(r => `
-      <article class="card">
+  const listExternal = $('#recipe-list-external');
+  const listOwn = $('#recipe-list-own');
+
+  function isExternal(r) {
+    if (r.source) return r.source === 'external';
+    return !!r.sourceUrl; // 兼容旧数据
+  }
+
+  function renderRecipeList(container, list) {
+    container.innerHTML = list.map(r => `
+      <article class="card" data-id="${r.id}">
         ${ImageOrPlaceholder(r.cover, r.title)}
         <div class="card-body">
           <div><strong>${r.title}</strong></div>
           ${r.sourceUrl ? `<div class="muted"><a href="${r.sourceUrl}" target="_blank" rel="noopener">原文链接</a></div>` : ''}
           ${r.tags?.length ? `<div class="muted">#${r.tags.join(' #')}</div>` : ''}
+          ${r.notes ? `<div class="muted">${r.notes}</div>` : ''}
+          <div class="toolbar">
+            <button class="icon-btn" data-action="delete" data-id="${r.id}">删除</button>
+          </div>
         </div>
       </article>
     `).join('');
   }
 
-  renderList(state.recipes);
+  function renderGroups(list) {
+    const ext = list.filter(isExternal);
+    const own = list.filter(r => !isExternal(r));
+    renderRecipeList(listExternal, ext);
+    renderRecipeList(listOwn, own);
+  }
+
+  renderGroups(state.recipes);
 
   $('#recipe-search')?.addEventListener('click', () => doSearch());
   $('#recipe-q')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
 
   function doSearch() {
     const q = String($('#recipe-q').value || '').trim().toLowerCase();
-    if (!q) { renderList(state.recipes); return; }
+    if (!q) { renderGroups(state.recipes); return; }
     const hits = state.recipes.filter(r => {
       const inTitle = r.title.toLowerCase().includes(q);
       const inTags = (r.tags || []).some(t => t.toLowerCase().includes(q));
       return inTitle || inTags;
     });
-    renderList(hits);
+    renderGroups(hits);
   }
+
+  // 删除菜谱（确认弹窗）- 事件委托
+  [listExternal, listOwn].forEach(container => container?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="delete"]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const ok = window.confirm('Delete this recipe? 确认删除该菜谱吗？');
+    if (!ok) return;
+    const next = state.recipes.filter(r => r.id !== id);
+    setState({ recipes: next });
+    renderGroups(next);
+  }));
+
+  // 自建菜谱：封面预览 + 保存
+  const ownForm = $('#recipe-form-own');
+  const coverInput = $('#recipe-cover');
+  const coverPreview = $('#recipe-cover-preview');
+  const ownReset = $('#recipe-own-reset');
+
+  coverInput?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) { coverPreview.style.display = 'none'; coverPreview.src=''; return; }
+    const url = await fileToDataUrl(file);
+    coverPreview.src = url; coverPreview.style.display = 'block';
+  });
+
+  ownReset?.addEventListener('click', () => {
+    coverPreview.style.display = 'none'; coverPreview.src = '';
+  });
+
+  ownForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(ownForm);
+    const rec = {
+      id: uid(),
+      title: String(fd.get('title') || '').trim(),
+      notes: String(fd.get('notes') || '').trim(),
+      tags: String(fd.get('tags') || '').split(',').map(s => s.trim()).filter(Boolean),
+      cover: '',
+      source: 'own',
+      createdAt: Date.now()
+    };
+    const file = fd.get('cover');
+    if (file && file instanceof File && file.size > 0) {
+      rec.cover = await fileToDataUrl(file);
+    }
+    setState({ recipes: [rec, ...state.recipes] });
+    ownForm.reset();
+    coverPreview.style.display = 'none';
+    renderGroups(state.recipes);
+  });
 }
 
 /** ---------- 视图：导入外部菜谱 ---------- */
@@ -243,10 +356,16 @@ function ImportView() {
   return `
   <section class="panel">
     <h2 class="panel-title">导入外部网页菜谱</h2>
-    <p class="muted">输入菜谱网页链接，将尝试抓取页面标题和主图（受 CORS 限制）。</p>
+    <p class="muted">输入菜谱网页链接，将尝试抓取页面标题和主图（受 CORS 限制）。可补充自定义标题与备注。</p>
     <form id="import-form">
       <div class="form-row">
         <input type="url" name="url" placeholder="https://…" required>
+      </div>
+      <div class="form-row">
+        <input type="text" name="title" placeholder="自定义标题（可选，留空则使用抓取标题）">
+      </div>
+      <div class="form-row">
+        <textarea name="notes" placeholder="我的备注（可选）"></textarea>
       </div>
       <div class="form-row">
         <button class="btn" type="submit" id="import-btn">抓取并保存</button>
@@ -289,10 +408,13 @@ function bindImportViewEvents() {
     const meta = await fetchPageMeta(url);
     const recipe = {
       id: uid(),
-      title: meta.title || '未命名菜谱',
+      title: String(fd.get('title') || '').trim() || meta.title || '未命名菜谱',
       cover: meta.cover || '',
       sourceUrl: url,
-      tags: []
+      tags: [],
+      notes: String(fd.get('notes') || '').trim(),
+      source: 'external',
+      createdAt: Date.now()
     };
     setState({ recipes: [recipe, ...state.recipes] });
     preview.style.display = 'block';
@@ -302,6 +424,7 @@ function bindImportViewEvents() {
         <div class="card-body">
           <div><strong>${recipe.title}</strong></div>
           <div class="muted"><a href="${recipe.sourceUrl}" target="_blank" rel="noopener">原文链接</a></div>
+          ${recipe.notes ? `<div class="muted">${recipe.notes}</div>` : ''}
         </div>
       </article>
     `;

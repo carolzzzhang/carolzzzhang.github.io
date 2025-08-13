@@ -74,6 +74,9 @@ textarea { min-height: 90px; }
 .card { border: 2px solid var(--border); border-radius: 16px; overflow: hidden; background: #fff; }
 .card img { width: 100%; height: 140px; object-fit: cover; display: block; border-bottom: 2px solid var(--border); }
 .card .card-body { padding: 10px 12px; }
+.card .toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+.icon-btn { background: #fff; color: var(--text); border: 2px solid var(--border); padding: 6px 10px; border-radius: 10px; cursor: pointer; font-size: 13px; }
+.icon-btn:disabled { opacity: .6; cursor: not-allowed; }
 .badge { display: inline-block; padding: 2px 8px; border: 2px solid var(--border); border-radius: 999px; font-size: 12px; margin-right: 6px; }
 
 .search-bar { display: flex; gap: 8px; }
@@ -108,5 +111,8 @@ textarea { min-height: 90px; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+
+/* 菜谱表单行距 */
+.recipe-form .form-row + .form-row { margin-top: 12px; }
 
 
